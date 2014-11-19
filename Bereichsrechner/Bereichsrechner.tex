@@ -1,0 +1,105 @@
+% das Papierformat zuerst
+\documentclass[a4paper, 11pt]{article}
+
+% deutsche Silbentrennung
+\usepackage[ngerman]{babel}
+
+\usepackage[utf8]{inputenc}    % wegen deutschen Umlauten
+
+\usepackage{ulem}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{fancyvrb}
+
+\input{Variable.tex}
+
+\hypersetup {
+    pdftitle={Bereichsrechner - Systemumgebung},
+    pdfsubject={Datenaustausch Quintiq - Oracle-DB},
+    pdfauthor={Dieter Engemann},
+    pdfkeywords={Quintiq, Entire Access, Oracle},
+    bookmarksopen={true},
+	bookmarksnumbered={true}
+}
+
+% ---------------------------------------------------------------------------------------
+% hier beginnt das Dokument
+\begin{document}
+
+\title{\FormatTitle{Bereichsrechner - Systemumgebung}}
+\author{Dieter Engemann\thanks{a566139.}
+\\HYDRO Aluminum Rolled Products GmbH
+\\Techn. IT}
+% Befehl entfernen, um aktuelles Datum zu erzeugen
+\date{24. September 2014}
+\maketitle
+
+\begin{figure}[!h]
+  \centering
+     \includegraphics[width=0.5\textwidth]{Graphics/Bereichsrechner.jpg}
+  \caption{Bereichsrechner}
+  \label{Bereichsrechner}
+\end{figure}
+
+\begin{abstract}
+Bereichsrechner: Betriebssystem, Systemumgebung, Datenbank etc.\\
+\newline
+Version: \today{}
+
+\end{abstract}
+
+
+% \pagenumbering{Roman}
+% Inhaltsverzeichnis anzeigen
+\newpage
+\tableofcontents
+
+
+
+% *************************************************************************************
+\newpage
+\section{Allgemeines}
+\subsection{LiramLArum}
+
+
+
+
+\newpage
+\section{Betriebssystem}
+\subsection{Bufferpool}
+\label{Bufferpool}
+
+
+
+
+
+
+\newpage
+\section{Shell-Umgebung}
+\subsection{???}
+
+
+\newpage
+\section{Sofware AG - Umgebung}
+\subsection{Start in eine New-Umgebung (Rechner-Upgrade}
+Das einfachste, um auf einer NEW-Maschine die SAG-Produkte zu starten, ist folgendes:\\
+
+Als User root \BlueTT{/etc/rc.sag.old} aufrufen.\\
+
+Startet \BlueTT{Bufferpool}, \BlueTT{Adabas}, \BlueTT{Network} (ohne Verbindung nach draussen!), \BlueTT{NDV-Server}. Falls vorhanden, auch \BlueTT{nwo} und \BlueTT{tomcat}.\\
+
+Kontrolle: \BlueTT{psg adanuc}    Ist ADABAS aktiv?
+
+
+\section{Hilfsprogramme}
+
+\begin{MyList}
+\item \textbf{FPTLDIP} Anzeige der Telegramm-Pointer (TGAP09)
+\item \textbf{/VAW/natural/scripts/start\_uptp} Pointer "`zusammenschieben"'
+\end{MyList}
+
+% das ist wohl jetzt das Ende des Dokumentes
+\end{document}
+
+
+

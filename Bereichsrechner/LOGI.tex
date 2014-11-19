@@ -1,0 +1,346 @@
+% das Papierformat zuerst
+\documentclass[a4paper, 11pt]{article}
+
+% deutsche Silbentrennung
+\usepackage[ngerman]{babel}
+
+\usepackage[utf8]{inputenc}    % wegen deutschen Umlauten
+
+\usepackage{ulem}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{fancyvrb}
+
+\input{Variable.tex}
+
+\hypersetup {
+    pdftitle={Bereichsrechner - Systemumgebung},
+    pdfsubject={Datenaustausch Quintiq - Oracle-DB},
+    pdfauthor={Dieter Engemann},
+    pdfkeywords={Quintiq, Entire Access, Oracle},
+    bookmarksopen={true},
+	bookmarksnumbered={true}
+}
+
+%\setlength{\parindent}{4em}
+\setlength{\parskip}{0.5em}
+% \renewcommand{\baselinestretch}{2.0}
+
+% ---------------------------------------------------------------------------------------
+% hier beginnt das Dokument
+\begin{document}
+
+\title{\FormatTitle{Bereichsrechner - LOGI}}
+\author{Dieter Engemann\thanks{a566139.}
+\\HYDRO Aluminum Rolled Products GmbH
+\\Techn. IT}
+% Befehl entfernen, um aktuelles Datum zu erzeugen
+\date{17. November 2014}
+\maketitle
+
+\begin{figure}[!h]
+  \centering
+     \includegraphics[width=0.5\textwidth]{Graphics/Logistik.jpg}
+  \caption{LOGI}
+  \label{LOGI}
+\end{figure}
+
+\begin{abstract}
+Bereichsrechner: Logistik, Torwaage etc.
+
+Version: \today{}
+
+\end{abstract}
+
+
+% \pagenumbering{Roman}
+% Inhaltsverzeichnis anzeigen
+\newpage
+\tableofcontents
+
+
+
+% *************************************************************************************
+\newpage
+\section{Allgemeines}
+\subsection{LiramLArum}
+
+This is the first paragraph, contains some text to test the paragraph
+interlining, paragraph indentation and some other features. Also, is 
+easy to see how new paragraphs are defined by simply entering a double 
+blank space.
+ 
+Hello,  here  is  some  text  without  a  meaning.   This  text  should
+show what a printed text will look like at this... 
+
+
+
+\begin{Verbatim}
+
+====== LOGI ======
+
+
+
+
+===== Packstücke =====
+Sollen in LOGI Packstücke mit [[MIF Material]] gelöscht werden ([[LOGI-Packstücke|Packstücke]] sind in [[SAP]] nicht bekannt !!) muss darauf geachtet werden, dass die Rollen in SAP von den BAV auch bearbeitet (gelöscht oder so) werden. 
+
+Ansonsten tauchen sie in der Differenzliste wieder auf. 
+
+===== LOGI - LOHN =====
+
+  *Ein SOFN-Telegramm (//"Schranke Oeffnen"//) wird beim Empfang eines KART-Telegrammes (//"Karte gelesen"//) vom Bereichsrechner [[LOHN|LOHN]] an den Bereichsrechner LOHN zurückgesendet.
+  *Aus dem Subprogram **TWN-WIEG[LOSTEP]]** wird ein SOFN-Telegramm an den Bereichsrechner LOHN gesendet.
+
+
+==== Lager ====
+
+
+==== Stanzomat ====
+
+<file>
+laut meinen Unterlagen sollte der Stanzomat z.Z. folgendermaßen 
+eingestellt sein:
+
+Baudrate:	2400 Bd
+Parität:		gerade		bei Nichtfunktionieren evt. ungerade ausprobieren, "un" ist bei mir handschriftlich durchgestrichen
+Datenbits	7
+Stopbits	1
+
+Buchse:	25pol. female
+
+Pinbelegung:	Standard RS232-C
+</file>
+
+Ansonsten ist die Schnittstelle über Jumper auf der Platine einstellbar. Wenn nichts funktionieren sollte, muß der Stanzomat geöffnet werden.
+
+
+===== Torwaage =====
+
+Bei der Verwiegung wird ein WIEG-Ereignis an das Produktionsbuch gesendet. \\
+Das Ereignis setzt sich zusammen aus
+Ereigins-Art: **WIEG**\\
+ID: **LK**\\
+Kennzeichen: **DAUR-SN 97**\\
+
+
+  *[[Coil-Aussenlager]]
+  *[[PBZ-Torwaage-Auswertungen]]
+===== Projekte =====
+
+  *[[Ablösung KVO-Dialog]] 
+  *[[LOGI-Platzdatei]]
+  *[[Focus Beverage GV]] 
+
+
+
+
+
+Ladelisten
+Einmal am Tag wird überprüft (5:20 Uhr; Programm: LOPBDEL2[LOSTEP]), welche Ladelisten den Status **5** haben. Bei dieser Überprüfung werden alle Packstücke, die zu dieser Ladeliste gehören, gelöscht. Das Löschen wird im Logfile /daten/delete_ladelisten.sh.<Datum-Uhrzeit>.liste protokolliert.
+
+In diesem Programm werden ab sofort (03.07.2009) auch die [[PRLA-Telegramme]] im Telestack gelöscht.
+
+
+Ausdruck Etikett mit Ladelisten-Nr
+Wenn das erste Packstück der Ladeliste ausgelagert wird, soll ein Etikett über den Labelserver mit der Ladelisten-Nr ausgedruckt werden.
+
+Es muss ein ETIK-Telegramm mit der folgenden Struktur aufgebaut werden:
+<code>
+| Formular-Druck                                                      Seite: 1 |
+| -----------------------------------------------------------------------------|
+|    Drucker prt818____    Kopien 1__              Datum / Zeit 20091118 011228|
+|                                                                              |
+| 01 ##E    #logistik/etiketten/LALI___________________________________________|
+| 02 ##P0001#139_______________________________________________________________|
+| 03 ##P0002#158997____________________________________________________________|
+
+
+Um das Etikett als PDF-File in einer E-Mail zu empfangen, muss der Drucker prt836 und die E-Mail Adresse angegeben werden.
+
+| Formular-Druck                                                      Seite: 1 |
+| -----------------------------------------------------------------------------|
+|    Drucker prt836____    Kopien 1__              Datum / Zeit 20091119 095514|
+|                                                                              |
+| 01 ##E    #logistik/etiketten/LALI___________________________________________|
+| 02 ##P0002#159129____________________________________________________________|
+| 03 ##N    #hans-dieter.engemann@hydro.com+++ETI-LALI_________________________|
+
+
+</code>
+
+===== Lagerhochhaus L1 =====
+==== I-Punkte IP1/IP2 ====
+Der Transport an den I-Punktemn bei der Einlagerung soll langsam sein (nicht immer)
+
+Einlagerung I-Punkt: LOPDIP-1[LOIP]/LOPDIP-2[LOIP]
+
+Programme schreiben Fehlerprotokolle
+
+  *[[LH1-Einlagerung Packereien]]
+===== Lagerhochhaus L2 =====
+
+<wrap bu>Platz- und Anlagenübersicht der Auslagerstrecke im Lagerhochhaus 2</wrap>
+
+{|class="inline" 
+|-
+! Platz
+! Bezeichnung
+! Anlage
+|- 
+|
+|
+|
+|} 
+
+
+  *[[LH2-Umbau-RFZ6-RFZ7]]
+  *[[LH2-Gewichtsanpassungen]] Auflastung Gasse 7
+===== Kartenleser Torwaage =====
+Die beiden Torwaage-Kartenleser TWKA und TWKA werden beide über den Terminalserver twts16a angesprochen.
+
+<wrap bu>Überwachung durch das Status-Telegramm</wrap>
+
+Über die ZLTK-Schnittstelle werden regelmäßig Status-Anforderunge an die einzelnen Kartenleser gesendet und die Rückantwort an die ZLTK-Schnittstelle zurückgesendet. Das gleiche Verfahren ist schon beim Rechner [[Lohn]] für die Besucherkartenleser realisiert.
+
+{| class="inline"
+!Quelle
+!Ziel
+!Programm
+|-
+|ZLTK
+|LOGI
+|AWNTKLST
+|-
+|TWKA/TWKE
+|LOGI
+|AWNTKLST
+|}
+
+<wrap bu>Verhalten des Kartenlesers ohne Rechner-Kopplung</wrap>
+
+Bei dem Fall, dass eine Kartenleser-Kopplung bzw. der Rechner LOGI nicht vorhanden ist, verhält sich der Kartenleser folgendermassen:
+
+<WRAP 50%>
+  *Wenn keine Quittung für das gesendete Telegramm empfangen wird, erscheint dieMeldung <wrap fgblue>**Bitte warten**</wrap>.
+  *Es wird versucht, das Datentelegramm dreimal zu senden.
+  *Wenn nach dem dritten Mal keine Quittung empfangen worden ist, erscheint die Meldung  <wrap fgblue>**Störung, bitte melden**</wrap>.
+</WRAP>
+Die Telegramme werden nicht gepuffert, auch nach Wiederherstellung der Rechnerverbindung werden keine Telegramme gesendet.
+
+==== Neue Karte erfassen ====
+
+Eine neue Karte für einen LKW wird mit Absprache der Personalabteilung (Heinz-Josef Pelzer, Tel.: 1273) erfasst. Die Personalabteilung führt eine Liste mit vergebenen Karten-Nr. und stellt neue Karten zur Verfügung.
+
+Auf dem LOGI-Rechner muss die Karte im Dialog **"Karten-LKW-Liste"** entsprechend der Vorgaben erfasst werden.
+<WRAP 60%><code>
+DI ___   LOGI   KLL Karten-LKW-Liste                                   08.02.11 
+FU ___ DR ___   Dialogmodus: Ändern                                    07:49:02 
+                                                                                
+ Karten-ID:    1666                                                             
+                                                                                
+ LKW-Daten                                                                      
+                                                                                
+ Nationalitaet D                       Zuladen-KNZ                              
+                                                                                
+ Kennzeichen   NE-EV 1                 Baenderfahrzeug X                        
+                                                                                
+ Spedition     KLEFISCH                Leergewicht     14000                    
+                                                                                
+                                                                                
+ Bemerkung                                                                      
+BAENDER                                                                         
+</code></WRAP>                                                                                 
+  *Programmänderungen müssen abhängig von der Funktion des LKWs erfolgen, in der Regel aber nicht.
+  *Eine Erfassung der Karte auf dem [[LOHN]]-Rechner muss ebenfalls erfolgen.
+======  ======
+
+
+
+</pre>
+
+
+
+\end{Verbatim}
+
+\subsection{Etikettenausdruck}
+
+Es soll für den Nummernkreis 4xxxxx (Ladeliste) folgendes Etikett automatisch bei der Auslagerung erzeugt werden. 
+
+Etikett mit Text "gesperrt, Zurück in den Produktionsbetrieb"
+
+Für den Nummerkreis 6xxxxx (Ladeliste) soll folgendes Etikett automatisch am Auslagerplatz gedruckt werden.
+
+Etikett mit Text "Auslagerung für Färberei"
+
+Sie dazu auch Dialog "702 Ladelisten auslagern" (Gruppe VER3)
+
+Es betrifft die Drucker-Nr. (Logi) 818, 819 und 820.
+
+Ausdruck erfolgt auf den Rampenplätzen wie bei den Versandetiketten.
+
+hier der Pfad zum Etikett:
+/logistik/etiketten/
+
+Der Name des Etiketts: 
+UNI1 
+
+Der vollständige Pfad:
+/logistik/etiketten/UNI1 
+
+UNI - Abkürzung für "universell".
+
+\subsection{Etikettenausdruck Versandhalle LH1 (Rampen)}
+Die Etiketten werden bei einem Platzzugang einer Palette auf den Rampen-Plätzen VA414, VA424, VA444 
+und VA464 gedruckt. Damit die Etiketten eher gedruckt werden, soll der Ausdruck schon bei einem 
+Platzzugang auf den Platz \textbf{VA407} (Verteilwagen) angestoßen werden.
+
+\begin{Verbatim}
+             +--------+ +--------+ +--------+ +--------+ +--------+
+             | APL5   | | APL4   | | APL3   | | APL2   | | APL1   |
+             +--------+ +--------+ +--------+ +--------+ +--------+
+[6]          | VA452  | | VA442| | | VA432  | | VA422  | | VA412  |
++--------+   +--------+ +--------+ +--------+ +--------+ +--------+
+| VA464  |   | VA453  | | VA443| | | VA433  | | VA423  | | VA413  |
++--------+   +--------+ +--------+ +--------+ +--------+ +--------+
+                                  
+                                   +--------+
+                                   | VA407  |
+                                   +--------+
+                                   
++--------+                         +--------+            +--------+
+| VA444  |                         | VA424  |            | VA414  |
++--------+                         +--------+            +--------+
+| VA445  |                         | VA425  |            | VA415  |
++--------+[4]                   [2]+--------+         [1]+--------+
+
+\end{Verbatim}
+
+\subsection{Etikettenausdruck beim Starten der Ladeliste}
+Beim Start der Ladeliste wird ein Etikett mit dem Kürzel \textbf{139...} und der Ladelisten-Nr. gedruckt.
+
+\begin{Verbatim}
+| Formular-Druck                                                      Seite: 1 |
+| -----------------------------------------------------------------------------|
+|    Drucker prt818____    Kopien 1__              Datum / Zeit 20130326 063944|
+|                                                                              |
+| 01 ##E    #logistik/etiketten/LALI___________________________________________|
+| 02 ##P0001#139......_________________________________________________________|
+| 03 ##P0002#285428____________________________________________________________|
+| 04 ##N    #hans-dieter.engemann@hydro.com+++ETI-LALI_________________________|
+\end{Verbatim}
+
+Abhängig von den Packstücken in der Ladeliste soll das Etikett auf einem Drucker in der Versandhalle 
+LH1 oder LH2 aoder bei einem Mix von Packstücken auf den Druckern in beiden Versandhallen gedruckt 
+werden.
+
+\begin{tabular} {ll}
+\textbf{Bereich} & \textbf{Drucker} \\
+\hline
+Lagerhochhaus LH1 &  818 \\    
+Lagerhochhaus LH2 &  820 \\  
+\end{tabular}
+
+
+
+\end{document}
