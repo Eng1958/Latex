@@ -1,0 +1,138 @@
+% das Papierformat zuerst
+\documentclass[a4paper, 10pt]{article}
+
+% deutsche Silbentrennung
+\usepackage[ngerman]{babel}
+
+\usepackage[utf8]{inputenc}    % wegen deutschen Umlauten
+
+\usepackage{ulem}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{fancyvrb}
+
+\input{Variable.tex}
+
+\hypersetup {
+    pdftitle={Quintiq-Kopplung},
+    pdfsubject={BANF, Bestellungen, Kostenstellen},
+    pdfauthor={Dieter Engemann},
+    pdfkeywords={BANF, SAP},
+    bookmarksopen=true
+}
+
+\makeindex
+
+%
+% this makes list spacing much better.
+%
+%\newenvironment{MyList}{
+%\begin{itemize}
+%  \setlength{\itemsep}{1pt}
+%  \setlength{\parskip}{0pt}
+%  \setlength{\parsep}{0pt}}{\end{itemize}
+%}
+
+% ---------------------------------------------------------------------------------------
+% hier beginnt das Dokument
+\begin{document}
+
+\title{\FormatTitle{Industrie 4.0}}
+\author{Dieter Engemann\thanks{a566139.}
+\\HYDRO Aluminum Rolled Products GmbH
+\\Tech. IT}
+% Befehl entfernen, um aktuelles Datum zu erzeugen
+\date{14. November 2014}
+
+\maketitle
+
+\begin{figure}[!h]
+  \centering
+     \includegraphics[width=0.7\textwidth]{../Graphics/Industrie40.png}
+  \caption{Industrie 4.0}
+  \label{Industrie4.0}
+\end{figure}
+
+\begin{abstract}
+etc.\\
+Version: \today{}
+\end{abstract}
+
+% Inhaltsverzeichnis anzeigen
+\newpage
+\tableofcontents
+
+
+
+
+
+% Kapitel soll auf naechster Seite beginnen
+\newpage
+
+\section{Industrie 4.0}
+
+\subsection{Brainstorming}
+\subsubsection{}
+\paragraph{Grundlage ist:} Verfgbarkeit von aktuellen nachvollziehbaren Informationen an jedem Ort
+und zu jeder Zeit der Produktion/Prozesse.\\
+\begin{itemize}
+  \item Selbst-Organisation
+  \item Selbst-Optimierung
+  \item Selbst-Diagnose
+  \item Selbst-Konfiguration
+\end{itemize}
+=> größere Dynamik 
+
+
+\paragraph{Vernetzung} aller beteiligten Objekte, Informationen, Ressourcen etc.
+\paragraph{Unternehmensübergreifende Vernetzung} mit resultierender intensiverer Koopeartion
+zwischen Lieferant / Produzent / Kunde.
+
+\paragraph{Zugriff der Automatisierungebenen} auf einen gemeinsamen Datenbestand (Cloud) um
+Emtscheidungen treffen zu können.
+\begin{itemize}
+  \item Feldebene
+  \item Steuerung
+  \item Scada / Visualisierung
+  \item MES /FLS /Shop Floor
+  \item ERP /SAP
+\end{itemize}
+
+\paragraph{Security} / Datensicherheit / Verschlüsselung
+
+\paragraph{Standardisierung} der Prozessabläufe, um eine höhere Flexibilität und Dynamik
+anbieten zu können. Individualisierung von Kundenwünschen und damit einhergehende Anpassungen
+der Produktionsschritte.
+
+\paragraph{Einheitliche Protokolle:} Unterstützung von Standard-Protokollen
+\begin{itemize}
+  \item OPC-Protokoll als M2M-Protokoll
+  \item Odette File Transfer Protkoll (Automobil) 
+\end{itemize}
+
+\paragraph{Anbindung vielfältiger Objekte:} Mobilfunk-Geräte, Tablets, Messgeräte, Sensoren
+
+\newpage
+\section{Hydro}
+Ansätze vorhanden:
+
+
+plus 
+\begin{itemize}
+  \item Anbindungen vieler Maschinen vorhanden
+  \item Daten-/Materialfluss und Datenkontrolle vorhanden 
+  \item Rel. große Vernetzung (Kabel)
+ 
+\end{itemize}
+
+
+minus
+\begin{itemize}
+  \item kein gemeinsamer Datenpool
+  \item Geringe Vernetzung auf Funk-Ebene für mobile Geräte etc
+  \item Keine durchgängiger Standards auf MES-Ebene (Dialog-Ebene)
+  \item Keine Industriestandard-Protokolle
+\end{itemize}
+
+
+\end{document}
