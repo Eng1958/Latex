@@ -1,0 +1,14 @@
+#TeXlipse project settings
+#Fri Nov 14 11:32:52 CET 2014
+markTmpDer=true
+builderNum=2
+outputDir=out
+makeIndSty=
+bibrefDir=
+outputFormat=pdf
+tempDir=tmp
+mainTexFile=Industrie4.0.tex
+outputFile=Industrie4.0.pdf
+langSpell=de
+markDer=true
+srcDir=tex
