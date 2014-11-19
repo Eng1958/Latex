@@ -1,0 +1,14 @@
+#TeXlipse project settings
+#Wed Nov 05 10:03:14 CET 2014
+markTmpDer=true
+builderNum=2
+outputDir=
+makeIndSty=
+bibrefDir=
+outputFormat=pdf
+tempDir=tmp
+mainTexFile=MQSeries.tex
+outputFile=MQSeries.pdf
+langSpell=de
+markDer=true
+srcDir=

@@ -1,0 +1,331 @@
+% das Papierformat zuerst
+\documentclass[a4paper, 11pt]{article}
+
+% deutsche Silbentrennung
+\usepackage[ngerman]{babel}
+
+\usepackage[utf8]{inputenc}    % wegen deutschen Umlauten
+
+\usepackage{ulem}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{fancyvrb}
+\usepackage{lmodern}
+\input{Variable.tex}
+
+\hypersetup {
+    pdftitle={ADABAS-Zugriffsmodul},
+    pdfsubject={ZMOD-Library },
+    pdfauthor={Dieter Engemann},
+    pdfkeywords={Zugriffsmodul, ADABAS, C-Programme},
+    bookmarksopen=true
+}
+
+
+
+% -----------------------------------------------------------------------------
+% hier beginnt das Dokument
+\begin{document}
+
+\title{\FormatTitle{MQSeries}}
+\author{Dieter Engemann\thanks{a566139.}
+\\HYDRO Aluminum Rolled Products GmbH
+\\Tech. IT}
+% Befehl entfernen, um aktuelles Datum zu erzeugen
+\date{26. August 2014}
+
+\maketitle
+
+\begin{figure}[!h]
+  \centering
+     \includegraphics[width=0.5\textwidth]{Graphics/MQSeries.png}
+  \caption{MQSeries}
+  \label{MQSeries}
+\end{figure}
+
+
+\begin{abstract}
+Beschreibung des Themas.\\
+\\
+Version: \today{}
+\end{abstract}
+
+% Inhaltsverzeichnis anzeigen
+\newpage
+\tableofcontents
+
+
+
+
+
+% Kapitel soll auf naechster Seite beginnen
+\newpage
+\section{Allgemeines}
+\subsection{MQS Explorer}
+Verzeichnis: \href{Y:/WSF-TIT/GRP/FIS/mqm/\_IBM-Install/for Win 7} 
+{Y:/WSF-TIT/GRP/FIS/mqm/\_IBM-Install/for Win 7}
+Duch Aufruf des Setup-Programms wird der MQS Explorer installiert.
+
+\section{Kapitel}
+\subsection{Lokaler MQSeries-Server}
+
+IP-Name/Adresse des lokalen MQSeries-Servers: \textbf{mqs.wgb.hal.hydro.com: (149.209.104.48)}. Der 
+festgelegte Port für die Kommunikation lautet: \textbf{1414}. 
+\small{
+\begin{verbatim}
+[root@sapg]/>netstat -an | grep 149.209.104.48
+tcp4       0      0  149.209.1.40.43342     149.209.104.48.1414    ESTABLISHED
+tcp4       0      0  149.209.1.40.44256     149.209.104.48.1414    ESTABLISHED
+tcp4       0      0  149.209.1.40.45127     149.209.104.48.1414    ESTABLISHED
+tcp4       0      0  149.209.1.40.32046     149.209.104.48.1414    ESTABLISHED
+\end{verbatim}}
+Hier sieht man,wie die verschiedenen Prozesse auf dem SAPG Verbindung über den Port 1414
+aufgebaut haben.
+
+Auf jedem Server läuft ein Queue-Manger
+\begin{Verbatim}
+\item QM.MQDEGV1.1
+\item QM.MQDEGV1.1
+\end{Verbatim}
+
+\subsection{Einrichten einer lokalen Queue}
+Acenture legt die neuen Queues auf dem MQSeries-Server mqs und mqst an.\\
+
+Beispiel: \textbf{LQ.DV.SAP\_PPQCP.GV.FLS}\\
+
+Auf dem SAPG/SAPT muss ein Eintrag im Konfigurationsfile \BlueTT{\$CFGPATH/kopplung.cfg} eingetragen werden.
+\begin{Verbatim} [frame=single, fontsize=\small, formatcom=\color{blue}] 
+#---------------------------------------------------------------
+# Konfiguration: Empfaenger
+# Quelle: PP2-SAP
+# Ziel:   SAPT
+#---------------------------------------------------------------
+PP2-SAPT:
+    MQSERVER = QM.MQDEGV2.4TOCLIENT/TCP/QMMQDEGV2-4(1444)
+    QueueManager = QM.MQDEGV2.4
+    TargetQueueSender = AQ.DATA_SND.GV.LOGI.DV.SAP
+    MQSeriesTyp = DATA_RCV
+    TargetQueueReceiver-1 = LQ.DV.SAP_PPQCP.GV.FLS
+    ReceiveWarteZeit = 10000
+    MaxDatenLaenge = 9000
+    MQSBrowse = FALSE
+\end{Verbatim}
+
+Im Dialogsystem muss eine Kopplungsdefinition und eine Tele-Kette \BlueTT{'PP2 SAPG'} bzw. \BlueTT{'PP2 SAPT'} erfasst werden. Zu der Tele-Kette gehören noch die individuellen Telegrammdefinitionen.
+
+
+
+\newpage
+\section{Websphere MQ-Protokoll}
+\subsection{Schreiben in die MQSeries-Queue}
+Das Schreiben in eine MQSeries-Queue wird mit dem Kommando \texttt{MQPUT} durchgeführt. Das Schreiben wird vom Queue-Manager mit \texttt{MQPUT\_REPLY} bestätigt. Anschließend wird das Schreiben mit MQCMIT bestätigt und wiederum vom Queue-Manager mit MQCMIT\_REPLY bestätigt.
+
+\small{
+\begin{verbatim}
+149.209.1.40	149.209.104.48	MQ	222	MQPUT       Q=AQ.DATA_RCV.GV.LOGI.DV.SAP (1040 bytes)
+149.209.104.48	149.209.1.40	MQ	630	MQPUT_REPLY Q=AQ.DATA_RCV.GV.LOGI.DV.SAP
+149.209.1.40	149.209.104.48	MQ	110	MQCMIT           
+149.209.104.48	149.209.1.40	MQ	110	MQCMIT_REPLY     
+\end{verbatim}}
+
+Im \texttt{MQCMIT\_REPLY} ist die Rückmeldung des Commits eingetragen.
+Compl. Code \texttt{MQCC\_OK (0)} und \\
+Reason Code: \texttt{MQRC\_NONE (0)}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Fehlerbehebung}
+Fehlermeldungen des MQSeries-Servers (mqs und mqst) sind unter \texttt{/var/mqm/errors} und \texttt{/var/mqm/qmgrs/QM!MQDEGV1!1/errors} zu finden.
+Die Fehlermeldungen des Clients (sapg und sapt) sind ebenfalls unter \texttt{/var/mqm/erros} zu finden.
+
+\subsection{MQCONN() [(2059, X'080B') "Queue manager not available for connection"]}
+
+Confirm that the queue manager is up and running and that the listener is running
+
+\begin{enumerate}
+	\item Ensure that the queue manager is running. You can use the \texttt{dspmq} command to verify this. The status of the queue manager should be Running.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{MQSeries-Kopplung}
+
+
+\section{C-Programme}
+\subsection{Versionen}
+Die C-Programme für die MQSeries-Kopplung befinden sich unter \BlueTT{S:/sys\_6.1/64/kopplung} in
+den Unterverzeichnissen der verschiedenen Versionen.\\
+
+\small{
+\begin{tabular}{lll}
+\textbf{Version} & \textbf{Datum} & \textbf{Änderung} \\
+\hline
+MQSeriesAIX\_v2.0.20 & & \\
+MQSeriesAIX\_v2.1.0 & & \\
+MQSeriesAIX\_v2.1.1 & 01.09.2014 & Reihenfolge Suchpfad (HYDROLIBPATH) fuer mqm-Lib geaendert\\ 
+MQSeriesAIX\_v2.1.2 & 04.11.2014 & TimeMark-Fuction mit Mikrosekunden\\ 
+\hline
+\end{tabular}
+}
+
+
+\subsection{MQSeries-API}
+
+\paragraph {MQCONN} stellt eine Verbindung mit einem Queue-Manager mit Hilfe von Standard-Links her.
+\paragraph {MQBEGIN} startet eine Arbeitseinheit, die durch den Queue-Manager koordiniert wird und
+externe XA-kompatible Ressource-Manager enthalten kann. Dieses API ist mit MQSeries Version 5 eingeführt worden. Es wird für die
+Koordinierung der Transaktionen , die Queues (MQPUT und MQGET unter Syncpoint-Bedingung) und Datenbank-
+Updates (SQL-Kommandos) verwenden.
+\paragraph {MQGET}
+\paragraph {MQPUT}
+\paragraph {MQPUT1} öffnet eine Queue, legt eine Message darauf ab und schließt die Queue wieder.
+Dieser API-Call stellt eine Kombination von MQOPEN, MQPUT und MQCLOSE dar.
+\paragraph {MQINQ} fordert Informationen über den Queue-Manager oder über eines seiner Objekte an,
+wie z.B. die Anzahl der Nachrichten in einer Queue.
+\paragraph {MQSET} verändert einige Attribute eines Objekts.
+\paragraph {MQCMIT} gibt an, dass ein Syncpoint erreicht worden ist.
+\paragraph {MQBACK} teilt dem Queue-Manager alle zurück gekommenen PUT's- und GET's-Nachrichten seit
+dem letzten Syncpoint mit.
+\paragraph {MQDISC} schließt die Übergabe einer Arbeitseinheit ein. Das Beenden eines Programms ohne
+Unterbrechung der Verbindung zum Queue-Manager verursacht ein "Rollback" (MQBACK).
+
+
+
+
+\subsection{Analyse}
+Mit Hilfe des UNIX-Tools \verb|lsof| kann man sich zu einem laufenden Prozesse Informationen anzeigen lassen.
+Eine MQSeries-Kopplung besteht üblicherweise aus dem Dämon und einem \verb|sender| und einem \verb|receiver|. Um alles anzuzeigen, was ein Prozesse mit einer PID geöffnet hat, kann die Option \verb|+p| verwendet werden. Dazu muss in der Prozessliste die PID des zu untersuchenden Prozesses ermittelt werden.
+
+\tiny{
+\begin{verbatim}
+[root@sapg]/develop_global>lsof +p 16777394
+lsof: WARNING: compiled for AIX version 6.1.3.0; this is 6.1.0.0.
+COMMAND      PID USER   FD   TYPE             DEVICE  SIZE/OFF  NODE NAME
+sender  16777394 sapg  cwd   VDIR              35,10       256   160 /develop (/dev/developlv)
+sender  16777394 sapg    0r  VCHR                2,2       0t0 32792 /dev/null
+sender  16777394 sapg    1w  VCHR                2,2       0t0 32792 /dev/null
+sender  16777394 sapg    2w  VCHR                2,2       0t0 32792 /dev/null
+sender  16777394 sapg    3w  VREG              10,16   1000178   190 /tmp (/dev/hd3)
+sender  16777394 sapg    4r  VREG              35,10     14964    95 /develop (/dev/developlv)
+sender  16777394 sapg    5w  VREG              10,16   1000178   190 /tmp (/dev/hd3)
+sender  16777394 sapg    6u  IPv4 0xf1000e00002173b8 0t5169419   TCP sapg.wgb.hal.hydro.com:32257->mqs.wgb.hal.hydro.com:ibm-mqseries (ESTABLISHED)
+sender  16777394 sapg   20u  IPv4 0xf1000e00006cb200       0t0   UDP *:39185
+\end{verbatim}}
+Hier ist zu sehen, dass der Prozess mit der PID 16777394 eine TCP-Verbindung zum MQS-Server \verb|mqs| über 
+den Port (ibm\_mqseries) aufgebaut (ESTABLISHED) hat.
+
+\tiny{
+\begin{verbatim}
+[root@sapg]/develop_global>lsof -i :1414
+lsof: WARNING: compiled for AIX version 6.1.3.0; this is 6.1.0.0.
+COMMAND       PID USER   FD   TYPE             DEVICE   SIZE/OFF NODE NAME
+sender    6029420 sapg    6u  IPv4 0xf1000e00006f6bb8   0t530324  TCP sapg.wgb.hal.hydro.com:41584->mqs.wgb.hal.hydro.com:ibm-mqseries (ESTABLISHED)
+sender    7340128 sapg    6u  IPv4 0xf1000e0000bbabb8  0t2967020  TCP sapg.wgb.hal.hydro.com:42221->mqs.wgb.hal.hydro.com:ibm-mqseries (ESTABLISHED)
+receiver  9306214 sapg    8u  IPv4 0xf1000e0000be33b8 0t87437493  TCP sapg.wgb.hal.hydro.com:32267->mqs.wgb.hal.hydro.com:ibm-mqseries (ESTABLISHED)
+sender    9633904 sapg    6u  IPv4 0xf1000e0000c04bb8  0t3681898  TCP sapg.wgb.hal.hydro.com:32266->mqs.wgb.hal.hydro.com:ibm-mqseries (ESTABLISHED)
+receiver 10223788 sapg    8u  IPv4 0xf1000e0000c103b8 0t43474992  TCP sapg.wgb.hal.hydro.com:32268->mqs.wgb.hal.hydro.com:ibm-mqseries (ESTABLISHED)
+sender   11403378 sapg    6u  IPv4 0xf1000e0000be83b8  0t5985084  TCP sapg.wgb.hal.hydro.com:32271->mqs.wgb.hal.hydro.com:ibm-mqseries (ESTABLISHED)
+sender   11534458 sapg    6u  IPv4 0xf1000e0000c0c3b8 0t28984000  TCP sapg.wgb.hal.hydro.com:32264->mqs.wgb.hal.hydro.com:ibm-mqseries (ESTABLISHED)
+sender   12058798 sapg    6u  IPv4 0xf1000e0000baebb8  0t3084306  TCP sapg.wgb.hal.hydro.com:32261->mqs.wgb.hal.hydro.com:ibm-mqseries (ESTABLISHED)
+receiver 13107332 sapg    8u  IPv4 0xf1000e000021b3b8 0t37518971  TCP sapg.wgb.hal.hydro.com:32270->mqs.wgb.hal.hydro.com:ibm-mqseries (ESTABLISHED)
+sender   15335672 sapg    6u  IPv4 0xf1000e0000bfd3b8   0t611125  TCP sapg.wgb.hal.hydro.com:32272->mqs.wgb.hal.hydro.com:ibm-mqseries (ESTABLISHED)
+sender   16777394 sapg    6u  IPv4 0xf1000e00002173b8  0t5185871  TCP sapg.wgb.hal.hydro.com:32257->mqs.wgb.hal.hydro.com:ibm-mqseries (ESTABLISHED)
+sender   16842822 sapg    6u  IPv4 0xf1000e00001ff3b8  0t5965867  TCP sapg.wgb.hal.hydro.com:32273->mqs.wgb.hal.hydro.com:ibm-mqseries (ESTABLISHED)
+\end{verbatim}}
+In diesem Beispiel sind alle Prozesses aufgelistet, die über die MQSeries-Port-Nr. 1414 (ibm\_mqseries) mit dem 
+MQS-Server \verb|mqs| kommunizieren.
+
+
+
+
+
+\subsection{runmqsc}
+Mit dem Befehl runmqsc werden MQSC-Befehle für einen Warteschlangenmanager abgesetzt. Mithilfe von 
+MQSC-Befehlen können Sie Verwaltungstasks ausführen, beispielsweise ein Objekt in einer lokalen 
+Warteschlange definieren, ändern oder löschen. Die MQSC-Befehle und deren Syntax werden im Handbuch 
+\href{http://www-01.ibm.com/support/knowledgecenter/api/content/nl/de/SSFKSJ_7.5.0/com.ibm.mq.ref.adm.doc/q085090_.htm}
+{Referenzinformationen zu MQSC} beschrieben.
+Sie müssen den Befehl runmqsc aus der Installation des Warteschlangenmanagers ausführen, mit dem Sie 
+arbeiten. Um herauszufinden, welcher Installation ein Warteschlangenmanager zugeordnet ist, verwenden 
+Sie den Befehl dspmq -o installation.
+Beenden Sie den Befehl runmqsc mit dem Befehl end. Sie können runmqsc aber auch mit dem Befehl exit oder quit stoppen.
+
+
+\section {OLD}
+
+\begin{verbatim}
+====== MQSeries ======
+
+===== Dokumentationen =====
+
+<WRAP><code>
+"I:\Projekte\E-Books\MQSeries\MQSeries_An_Introduction_to_Messaging_and_Queuing_horaa101.pdf"
+"I:\Projekte\E-Books\MQSeries\MQSeries_Application_Programming_Guide_csqzal03.pdf"
+"I:\Projekte\E-Books\MQSeries\MQSeries_Application_Programming_Reference_csqzak03.pdf"
+"I:\Projekte\E-Books\MQSeries\MQSeries_Application_Programming_Reference_Summary_csqzam03.pdf"
+
+listFiles("/Projekte/E-Books/MQSeries", "[A-Z]*");
+listFiles("/Projekte/E-Books/MQSeries", "Appl");
+listFiles("/Projekte/E-Books/MQSeries", "[A-Z]*mp3");
+listFiles("/Projekte/E-Books/MQSeries", "[A-Z]*pdf");
+</code></WRAP>
+
+===== Fehlermeldungen =====
+
+<wrap bu>Mail-Meldungen</wrap>
+
+  cmd "ssh sapg -l root rsh sapg -l mqm runmqsc QM.MQDEGV1.1" returned rc 255
+  relevant info found
+  start: 20091107.050200, stop: 20091107.050222, duration: 22 seconds, PID: 626926
+
+bedeutet in diesem Fall, dass das ssh-Kommando nicht funktioniert hat.
+\\
+\\
+
+
+<wrap bold>mqs [2010-04-01 12:42] mqs error on sapg-QM.MQDEGV1.1-LQ.DV.SAP.GV.ADABASDB-11187-100000-22m</wrap>
+<WRAP><code>
+Alarm for QM.MQDEGV1.1-LQ.DV.SAP.GV.ADABASDB on sapg, 11187 entries found, alarm limit=10000, maxDepth=100000
+remaining time: 22m
+--- error log for QM.MQDEGV1.1-LQ.DV.SAP.GV.ADABASDB
+20100401.124208 sapg QM.MQDEGV1.1 LQ.DV.SAP.GV.ADABASDB 11187 10000 10000 100000 22m
+20100401.123711 sapg QM.MQDEGV1.1 LQ.DV.SAP.GV.ADABASDB 12225 10000 10000 100000 24m
+20100401.123209 sapg QM.MQDEGV1.1 LQ.DV.SAP.GV.ADABASDB 12973 10000 10000 100000 25m
+20100401.122609 sapg QM.MQDEGV1.1 LQ.DV.SAP.GV.ADABASDB 11437 10000 10000 100000 22m
+20100401.122207 sapg QM.MQDEGV1.1 LQ.DV.SAP.GV.ADABASDB 11903 10000 10000 100000 23m
+20100401.121712 sapg QM.MQDEGV1.1 LQ.DV.SAP.GV.ADABASDB 12230 10000 10000 100000 24m
+20100401.121207 sapg QM.MQDEGV1.1 LQ.DV.SAP.GV.ADABASDB 12039 10000 10000 100000 24m
+20100401.120708 sapg QM.MQDEGV1.1 LQ.DV.SAP.GV.ADABASDB 12248 10000 10000 100000 24m
+20100401.120208 sapg QM.MQDEGV1.1 LQ.DV.SAP.GV.ADABASDB 12464 10000 10000 100000 24m
+20100401.115707 sapg QM.MQDEGV1.1 LQ.DV.SAP.GV.ADABASDB 12786 10000 10000 100000 25m
+--- EOF error log for QM.MQDEGV1.1-LQ.DV.SAP.GV.ADABASDB
+relevant info found
+start: 20100401.124201, stop: 20100401.124220, duration: 19 seconds, PID: 766172
+</code></WRAP>
+
+Hier ist das Limit von 10000 Einträgen in der Queue überschritten worden, Telegramme werden nicht abgeholt.
+
+
+===== Fehler-Auswertungen =====
+
+im Verzeichnis <wrap bold fgblue>/var/mqm/errors</wrap> existieren Files <wrap bold fgblue>AMQ*.0.FDC</wrap>, die auf ein bestehenden Problem hinweisen. Außerdem existieren Log-Files <wrap bold fgblue>AMQERR*.LOG</wrap>.
+
+<wrap bu>Läuft ein MQSeries-Server?</wrap>
+
+Prinzipiell kann mit <wrap bold fgblue>telnet sapg <portnummer></wrap> (Portnummer z.B. 1444) getestet werden, ob ein MQSeries-Server antwortet.
+
+
+
+===== Schnippsel =====
+
+der explizite Rollback ist nach Rücksprache mit Herrn Böhm der richtige Weg, falls sie den Satz nicht in Ihrer Datenbank einfügen konnten. 
+Im anderen Fall wird beim nächsten Lesezugriff ein impliziter Commit gemacht.
+
+\end{verbatim}
+
+
+% das ist wohl jetzt das Ende des Dokumentes
+\end{document}
+
